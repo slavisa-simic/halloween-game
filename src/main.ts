@@ -95,9 +95,14 @@ const renderer = createRenderer(canvas);
 // Cosmetic features plug in from outside the game loop (architecture 2.2).
 installPuddle({ game, renderer });
 // Each run gets a fresh keyboard, so a key still held from the crash does not
-// count as already pressed in the next run.
+// count as already pressed in the next run. Dispose the previous attachment
+// first so window listeners do not pile up and multiply each keypress into N
+// dispatches — otherwise stale `primary` intents queue up during a jump and
+// fire as phantom jumps on landing.
+let keyboardAttachment: { dispose(): void } | null = null;
 function bindKeyboard(): void {
-  attachKeyboard(window, createKeyboard(), (intent) => {
+  keyboardAttachment?.dispose();
+  keyboardAttachment = attachKeyboard(window, createKeyboard(), (intent) => {
     game.dispatch(intent);
   });
 }
