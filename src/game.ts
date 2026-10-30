@@ -483,9 +483,15 @@ export function createGame(deps: GameDeps): Game {
     // Step 1: at most one queued intent per step, oldest first; the queue
     // waits while the dino is in the air.
     const intent = isAirborne(run) ? undefined : queue.shift();
+    const previousPhase = run.phase;
     const result = step(run, intent, stepDeps);
     // Commit first, so a listener calling state() sees the post-step run.
     run = result.run;
+    // A fresh run must not inherit intents queued during idle/dead; otherwise
+    // a space mashed before restart becomes a jump on tick 1 of the new run.
+    if (previousPhase !== 'running' && run.phase === 'running') {
+      queue.length = 0;
+    }
     for (const event of result.events) {
       bus.emit(event);
     }
