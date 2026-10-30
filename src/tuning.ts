@@ -19,6 +19,48 @@ export const PALETTE = {
   bg: '#f7f7f7',
   fg: '#535353',
   accent: '#c4302b',
+  night: '#0b1026',
+  moon: '#f6e58d',
+  cloud: '#2a3660',
+  pumpkinOrange: '#ff8c00',
+} as const;
+
+/**
+ * Moon configuration (functional spec 003 §2.3, §2.4): rest position, size,
+ * compound growth per milestone (five percent), wobble amplitude and duration.
+ * `wobbleTicks` is about 200 ms and `growTicks` about 300 ms at 60 Hz.
+ * `maxRadius` is half the game-area height's half so the diameter caps at
+ * `CANVAS.height / 2` and never obscures the ground or the dinosaur.
+ */
+export const MOON = {
+  centerX: 650,
+  centerY: 60,
+  baseRadius: 20,
+  maxRadius: 75,
+  growFactor: 1.05,
+  growTicks: 18,
+  wobblePx: 3,
+  wobbleTicks: 12,
+} as const;
+
+/**
+ * Cloud configuration (functional spec 003 §2.2): parallax speed as a fraction
+ * of the ground scroll, initial population seeded at run start, placement band
+ * in the upper sky, cloud size ranges, and the seeded inter-cloud gap range.
+ * `salt` is XORed with `state.seed` to make the per-run cloud Rng.
+ */
+export const CLOUDS = {
+  speedFactor: 0.3,
+  initial: 3,
+  minY: 10,
+  maxY: 80,
+  minWidth: 40,
+  maxWidth: 80,
+  minHeight: 10,
+  maxHeight: 18,
+  minGapPx: 150,
+  maxGapPx: 350,
+  salt: 0x434c4f55,
 } as const;
 
 /**
